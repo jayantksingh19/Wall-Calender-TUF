@@ -39,11 +39,11 @@ function holiday(m,d){ return HOLIDAYS[`${String(m+1).padStart(2,"0")}-${String(
 
 // ── Main Component ─────────────────────────────────────────────────────────
 export default function WallCalendar() {
-  const now      = new Date();
-  const todayKey = toKey(now.getFullYear(), now.getMonth(), now.getDate());
-
-  const [year,  setYear]  = useState(now.getFullYear());
-  const [month, setMonth] = useState(now.getMonth());
+  // Calculate using LOCAL time to fix timezone issue on deployed servers
+  // new Date() on server = UTC, but user's browser = local time (e.g. IST = UTC+5:30)
+  const [todayKey, setTodayKey] = useState("");
+  const [year,  setYear]  = useState(new Date().getFullYear());
+  const [month, setMonth] = useState(new Date().getMonth());
   const [start, setStart] = useState(null);
   const [end,   setEnd]   = useState(null);
   const [step,  setStep]  = useState(0);
@@ -54,6 +54,14 @@ export default function WallCalendar() {
   const [dark,  setDark]  = useState(false);
 
   const accent = THEMES[month];
+
+  // Set todayKey from CLIENT (browser local time) — fixes UTC timezone bug on Vercel/Netlify
+  useEffect(() => {
+    const now = new Date();
+    setTodayKey(toKey(now.getFullYear(), now.getMonth(), now.getDate()));
+    setYear(now.getFullYear());
+    setMonth(now.getMonth());
+  }, []);
 
   // Load notes from localStorage
   useEffect(() => {
@@ -280,19 +288,19 @@ export default function WallCalendar() {
                   else if (isToday)  circleStyle = {...circleStyle, border:`2px solid ${accent}`, color:accent, fontWeight:700};
 
                   return (
-                    <div
+                    <button
                       key={i}
-                      className={day ? "day-btn" : ""}
                       onClick={() => day && clickDay(day)}
-                      onMouseEnter={() => step===1 && day && setHover(toKey(year,month,day))}
+                      disabled={!day}
                       style={{
                         display:"flex", alignItems:"center", justifyContent:"center",
-                        padding:"3px 0", minHeight:42,
+                        padding:"3px 0", minHeight:42, minWidth:0,
+                        border:"none", background:"transparent",
                         cursor: day ? "pointer" : "default",
                         touchAction:"manipulation",
                         WebkitTapHighlightColor:"transparent",
                         userSelect:"none",
-                        // Range background via gradient — no child element blocking taps
+                        opacity:1,
                         backgroundImage: isStart
                           ? `linear-gradient(to right, transparent 50%, ${accent}22 50%)`
                           : isEnd
@@ -302,14 +310,14 @@ export default function WallCalendar() {
                       }}
                     >
                       {day ? (
-                        <div style={circleStyle}>
+                        <div style={{...circleStyle, pointerEvents:"none"}}>
                           {day}
                           {holiday(month,day) && (
                             <span style={{ position:"absolute", bottom:1, left:"50%", transform:"translateX(-50%)", width:4, height:4, borderRadius:"50%", background:(isStart||isEnd)?"#fff":accent, pointerEvents:"none" }} />
                           )}
                         </div>
                       ) : null}
-                    </div>
+                    </button>
                   );
                 })}
               </div>
