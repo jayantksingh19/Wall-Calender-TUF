@@ -118,9 +118,10 @@ Open [http://localhost:3000](http://localhost:3000)
 
 ---
 
-## 🌐 Deploy
+## 🌐 Deploy on Netlify
 
-```bash
-npm run build
-npx vercel
-```
+1. Push code to GitHub
+2. Go to netlify.com → Add New Site → Import from GitHub
+3. Select repo → Deploy
+
+🔗 Live Demo: https://wall-calender.netlify.app
