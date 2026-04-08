@@ -155,6 +155,8 @@ export default function WallCalendar() {
         .day-btn { transition: opacity 0.1s; }
         .day-btn:active { opacity: 0.5 !important; }
         .nav-btn:active { opacity: 0.6 !important; }
+        button { all: unset; }
+        button { display: flex; align-items: center; justify-content: center; }
         .wc-body { display: grid; grid-template-columns: 1fr 260px; }
         @media(max-width:600px){ .wc-body { grid-template-columns: 1fr !important; } .wc-sidebar { border-left: none !important; border-top: 1px solid #eee; } }
       `}</style>
@@ -291,7 +293,6 @@ export default function WallCalendar() {
                     <button
                       key={i}
                       onClick={() => day && clickDay(day)}
-                      disabled={!day}
                       style={{
                         display:"flex", alignItems:"center", justifyContent:"center",
                         padding:"3px 0", minHeight:42, minWidth:0,
